@@ -42,8 +42,8 @@ services:
       context: .
       dockerfile: auth-service/Dockerfile
     environment:
-      # Removed redundant/conflicting TZ and JAVA_TOOL_OPTIONS
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/postgres?options=-c timezone=UTC
+      # Fixed: Use internal port 5432, not 5433
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres?options=-c timezone=UTC
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -60,8 +60,8 @@ services:
       context: .
       dockerfile: polls-service/Dockerfile
     environment:
-      # Removed redundant/conflicting TZ and JAVA_TOOL_OPTIONS
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/postgres?options=-c timezone=UTC
+      # Fixed: Use internal port 5432, not 5433
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres?options=-c timezone=UTC
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -79,8 +79,8 @@ services:
       context: .
       dockerfile: voting-service/Dockerfile
     environment:
-      # Removed redundant/conflicting TZ and JAVA_TOOL_OPTIONS
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/postgres?options=-c timezone=UTC
+      # Fixed: Use internal port 5432, not 5433
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres?options=-c timezone=UTC
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092

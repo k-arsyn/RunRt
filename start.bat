@@ -87,20 +87,15 @@ goto menu
 
 :start_services
 echo.
-echo Starting all services in separate windows (UTC timezone)...
+echo Starting all services via Docker Compose...
+echo This will build and start all microservices in Docker containers.
 echo.
-set MAVEN_OPTS=-Duser.timezone=UTC
-start "Auth Service (8081)" cmd /k "set MAVEN_OPTS=-Duser.timezone=UTC && mvn -pl auth-service spring-boot:run"
-timeout /t 3 /nobreak >nul
-start "Polls Service (8082)" cmd /k "set MAVEN_OPTS=-Duser.timezone=UTC && mvn -pl polls-service spring-boot:run"
-timeout /t 3 /nobreak >nul
-start "Voting Service (8083)" cmd /k "set MAVEN_OPTS=-Duser.timezone=UTC && mvn -pl voting-service spring-boot:run"
-timeout /t 3 /nobreak >nul
-start "Results Service (8084)" cmd /k "set MAVEN_OPTS=-Duser.timezone=UTC && mvn -pl results-service spring-boot:run"
-timeout /t 3 /nobreak >nul
-start "API Gateway (8080)" cmd /k "set MAVEN_OPTS=-Duser.timezone=UTC && mvn -pl api-gateway spring-boot:run"
+%DC% up -d --build
 echo.
-echo All services are starting... Check each window for startup progress.
+echo Waiting for services to be ready (45 seconds)...
+timeout /t 45 /nobreak >nul
+echo.
+echo All services are running in Docker!
 echo.
 echo Service URLs:
 echo - API Gateway:     http://localhost:8080
@@ -109,6 +104,14 @@ echo - Polls Service:   http://localhost:8082
 echo - Voting Service:  http://localhost:8083
 echo - Results Service: http://localhost:8084
 echo - Zipkin UI:       http://localhost:6334
+echo.
+echo Useful commands:
+echo   View all logs:        %DC% logs -f
+echo   View service logs:    %DC% logs -f [service-name]
+echo   Example:              %DC% logs -f auth-service
+echo.
+echo Container status:
+docker ps --format "table {{.Names}}\t{{.Status}}"
 pause
 goto menu
 

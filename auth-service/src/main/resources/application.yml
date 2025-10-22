@@ -1,0 +1,47 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    # Allow overriding from environment (used by docker-compose). Default keeps existing localhost:5433 for local runs.
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/postgres}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:postgres}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:postgres}}
+    hikari:
+      # ensure the DB session timezone is set to UTC to match container configuration
+      connection-init-sql: SET TIME ZONE 'UTC'
+    properties:
+      currentSchema: public
+      # Explicitly set the client's preferred time zone to the correct IANA name
+      # This forces the JDBC driver to use Asia/Kolkata, which the server understands,
+      # or to send UTC, which is universally safe.
+      options: -c timezone=Asia/Kolkata # Use the correct IANA name here
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          # make Hibernate use UTC when writing/reading TIMESTAMP WITH TIME ZONE
+          time_zone: UTC
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  tracing:
+    sampling:
+      probability: 1.0
+  # Allow overriding Zipkin endpoint via environment (useful when remapping ports). Default points to host:6334 which maps to container 9411 in docker-compose.
+  zipkin:
+    tracing:
+      endpoint: ${SPRING_ZIPKIN_ENDPOINT:http://localhost:6334/api/v2/spans}
+
+auth:
+  # Generate a 256-bit (32-byte) secret and base64-encode it
+  jwt-base64-secret: "dGVzdC1kZXYtc2VjcmV0LXNob3VsZC1iZS1yZXBsYWNlZA=="
+  jwt-expiration-ms: 86400000

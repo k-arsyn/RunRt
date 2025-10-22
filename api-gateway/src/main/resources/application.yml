@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: polls
+          uri: http://localhost:8082
+          predicates:
+            - Path=/polls/**
+          filters:
+            - JwtRelayFilter
+        - id: voting
+          uri: http://localhost:8083
+          predicates:
+            - Path=/votes/**
+          filters:
+            - JwtRelayFilter
+        - id: auth
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth/**
+      default-filters:
+        - JwtRelayFilter
+  tracing:
+    sampling:
+      probability: 1.0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  zipkin:
+    tracing:
+      endpoint: ${SPRING_ZIPKIN_ENDPOINT:http://localhost:6334/api/v2/spans}
+
+gateway:
+  jwt-base64-secret: dGVzdC1nYXRld2F5LXNlY3JldA==
+  jwt-expiration-ms: 86400000

@@ -1,0 +1,147 @@
+version: '3.8'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "3447:3447"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:3447
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  postgres:
+    image: bitnami/postgresql:latest
+    user: root
+    environment:
+      # FIX: Use Bitnami's specific variables
+      POSTGRESQL_USERNAME: postgres  # Replaces POSTGRES_USER
+      POSTGRESQL_PASSWORD: postgres  # Replaces POSTGRES_PASSWORD
+      POSTGRESQL_DATABASE: postgres  # Recommended for Bitnami
+      TZ: UTC
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/bitnami/postgresql # Volumes path is also different for Bitnami
+
+  # -------------------------- AUTH SERVICE (CLEANED) --------------------------
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    environment:
+      # Removed redundant/conflicting TZ and JAVA_TOOL_OPTIONS
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/postgres?options=-c timezone=UTC
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8081"
+  # ----------------------------------------------------------------------------
+
+  # -------------------------- POLLS SERVICE (CLEANED) -------------------------
+  polls-service:
+    build:
+      context: .
+      dockerfile: polls-service/Dockerfile
+    environment:
+      # Removed redundant/conflicting TZ and JAVA_TOOL_OPTIONS
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/postgres?options=-c timezone=UTC
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      - postgres
+      - kafka
+    ports:
+      - "8082:8082"
+  # ----------------------------------------------------------------------------
+
+  # -------------------------- VOTING SERVICE (CLEANED) ------------------------
+  voting-service:
+    build:
+      context: .
+      dockerfile: voting-service/Dockerfile
+    environment:
+      # Removed redundant/conflicting TZ and JAVA_TOOL_OPTIONS
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/postgres?options=-c timezone=UTC
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      - postgres
+      - kafka
+    ports:
+      - "8083:8083"
+  # ----------------------------------------------------------------------------
+
+  # ------------------------- RESULTS SERVICE (CLEANED) ------------------------
+  results-service:
+    build:
+      context: .
+      dockerfile: results-service/Dockerfile
+    environment:
+      # Removed redundant/conflicting TZ and JAVA_TOOL_OPTIONS
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      - redis
+      - kafka
+    ports:
+      - "8084:8084"
+  # ----------------------------------------------------------------------------
+
+  # -------------------------- API GATEWAY (CLEANED) ---------------------------
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    environment:
+      # Removed redundant/conflicting TZ and JAVA_TOOL_OPTIONS
+      GATEWAY_JWT_BASE64_SECRET: dGVzdC1nYXRld2F5LXNlY3JldA==
+      GATEWAY_JWT_EXPIRATION_MS: 86400000
+      SPRING_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      - auth-service
+      - polls-service
+      - voting-service
+      - results-service
+    ports:
+      - "8080:8080"
+  # ----------------------------------------------------------------------------
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "6334:9411"
+    environment:
+      - TZ=UTC
+
+
+volumes:
+  pgdata:

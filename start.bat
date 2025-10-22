@@ -165,6 +165,34 @@ echo.
 pause
 goto menu
 
+:check_logs
+echo.
+echo ========================================
+echo Checking Service Logs for Errors
+echo ========================================
+echo.
+echo AUTH SERVICE:
+docker logs --tail 20 runrt-auth-service-1 2>&1 | findstr /C:"Started" /C:"Error" /C:"Exception" /C:"Failed"
+echo.
+echo POLLS SERVICE:
+docker logs --tail 20 runrt-polls-service-1 2>&1 | findstr /C:"Started" /C:"Error" /C:"Exception" /C:"Failed"
+echo.
+echo VOTING SERVICE:
+docker logs --tail 20 runrt-voting-service-1 2>&1 | findstr /C:"Started" /C:"Error" /C:"Exception" /C:"Failed"
+echo.
+echo RESULTS SERVICE:
+docker logs --tail 20 runrt-results-service-1 2>&1 | findstr /C:"Started" /C:"Error" /C:"Exception" /C:"Failed"
+echo.
+echo API GATEWAY:
+docker logs --tail 20 runrt-api-gateway-1 2>&1 | findstr /C:"Started" /C:"Error" /C:"Exception" /C:"Failed"
+echo.
+echo.
+echo To view full logs for a service:
+echo   %DC% logs -f [service-name]
+echo   Example: %DC% logs -f auth-service
+pause
+goto menu
+
 :clean_build
 echo.
 echo Cleaning and rebuilding all services (UTC timezone)...

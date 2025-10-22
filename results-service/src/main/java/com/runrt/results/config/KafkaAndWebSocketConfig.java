@@ -27,14 +27,16 @@ public class KafkaAndWebSocketConfig implements WebSocketMessageBrokerConfigurer
 
     @Bean
     public ConsumerFactory<String, VoteRecordedEvent> consumerFactory() {
-        JsonDeserializer<VoteRecordedEvent> jsonDeserializer = new JsonDeserializer<>(VoteRecordedEvent.class);
-        jsonDeserializer.addTrustedPackages("com.runrt.common.events");
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "results-service");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, jsonDeserializer);
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, "com.runrt.common.events");
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+
+        // Configure JsonDeserializer via setter methods only (not via props)
+        JsonDeserializer<VoteRecordedEvent> jsonDeserializer = new JsonDeserializer<>(VoteRecordedEvent.class);
+        jsonDeserializer.addTrustedPackages("*");
+
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), jsonDeserializer);
     }
 

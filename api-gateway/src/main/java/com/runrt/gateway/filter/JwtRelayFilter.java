@@ -19,6 +19,7 @@ public class JwtRelayFilter extends AbstractGatewayFilterFactory<JwtRelayFilter.
 
     public JwtRelayFilter(@Value("${gateway.jwt-base64-secret:dGVzdC1nYXRld2F5LXNlY3JldA==}") String base64Secret,
                           @Value("${gateway.jwt-expiration-ms:86400000}") long expMs) {
+        super(Config.class);
         this.jwtUtil = new JwtUtil(base64Secret, expMs);
     }
 

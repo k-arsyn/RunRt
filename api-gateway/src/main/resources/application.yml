@@ -40,5 +40,8 @@ management:
 
 gateway:
   jwt:
-    base64secret: ${GATEWAY_JWT_BASE64SECRET:dGVzdC1nYXRld2F5LXNlY3JldA==}
+    # Secure 256-bit (32-byte) base64-encoded secret for JWT signing
+    # MUST match the auth-service secret for token validation
+    # This is a 32-byte string "RunRtSecureJWTSigningKey2025!!" encoded in base64
+    base64secret: ${GATEWAY_JWT_BASE64SECRET:UnVuUnRTZWN1cmVKV1RTaWduaW5nS2V5MjAyNSEhISEhISEhISEhISEhISEhISE=}
     expirationms: ${GATEWAY_JWT_EXPIRATIONMS:86400000}

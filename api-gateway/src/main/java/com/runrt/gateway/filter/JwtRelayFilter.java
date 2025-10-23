@@ -2,7 +2,7 @@ package com.runrt.gateway.filter;
 
 import com.runrt.common.security.JwtUtil;
 import io.jsonwebtoken.Claims;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -17,10 +17,10 @@ public class JwtRelayFilter extends AbstractGatewayFilterFactory<JwtRelayFilter.
 
     private final JwtUtil jwtUtil;
 
-    public JwtRelayFilter(@Value("${gateway.jwt.base64secret:dGVzdC1nYXRld2F5LXNlY3JldA==}") String base64Secret,
-                          @Value("${gateway.jwt.expirationms:86400000}") long expMs) {
+    @Autowired
+    public JwtRelayFilter(JwtUtil jwtUtil) {
         super(Config.class);
-        this.jwtUtil = new JwtUtil(base64Secret, expMs);
+        this.jwtUtil = jwtUtil;
     }
 
     public static class Config { }

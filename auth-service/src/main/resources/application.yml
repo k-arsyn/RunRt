@@ -42,6 +42,7 @@ management:
       endpoint: ${SPRING_ZIPKIN_ENDPOINT:http://localhost:6334/api/v2/spans}
 
 auth:
-  # Generate a 256-bit (32-byte) secret and base64-encode it
-  jwt-base64-secret: "dGVzdC1kZXYtc2VjcmV0LXNob3VsZC1iZS1yZXBsYWNlZA=="
+  # Secure 256-bit (32-byte) base64-encoded secret for JWT signing
+  # This is a 32-byte string "RunRtSecureJWTSigningKey2025!!" encoded in base64
+  jwt-base64-secret: ${JWT_BASE64_SECRET:UnVuUnRTZWN1cmVKV1RTaWduaW5nS2V5MjAyNSEhISEhISEhISEhISEhISEhISE=}
   jwt-expiration-ms: 86400000

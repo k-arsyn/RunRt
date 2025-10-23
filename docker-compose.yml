@@ -48,6 +48,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+      # Secure 256-bit JWT secret (must match API Gateway)
+      JWT_BASE64_SECRET: UnVuUnRTZWN1cmVKV1RTaWduaW5nS2V5MjAyNSEhISEhISEhISEhISEhISEhISE=
     depends_on:
       - postgres
     ports:
@@ -116,8 +118,8 @@ services:
       context: .
       dockerfile: api-gateway/Dockerfile
     environment:
-      # Fixed: Use underscores which Spring converts to dots (gateway.jwt.base64-secret)
-      GATEWAY_JWT_BASE64SECRET: dGVzdC1nYXRld2F5LXNlY3JldA==
+      # Secure 256-bit JWT secret (MUST match auth-service)
+      GATEWAY_JWT_BASE64SECRET: UnVuUnRTZWN1cmVKV1RTaWduaW5nS2V5MjAyNSEhISEhISEhISEhISEhISEhISE=
       GATEWAY_JWT_EXPIRATIONMS: 86400000
       SPRING_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:

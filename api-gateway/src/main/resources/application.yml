@@ -7,24 +7,62 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: polls
-          uri: http://localhost:8082
+        # Auth Service Routes - must come before default filters
+        - id: auth-service
+          uri: http://auth-service:8081
           predicates:
-            - Path=/polls/**
+            - Path=/api/auth/**
           filters:
-            - JwtRelayFilter
-        - id: voting
-          uri: http://localhost:8083
+            - name: StripPrefix
+              args:
+                parts: 0
+
+        # Polls Service Routes
+        - id: polls-service
+          uri: http://polls-service:8082
           predicates:
-            - Path=/votes/**
+            - Path=/api/polls/**
           filters:
-            - JwtRelayFilter
-        - id: auth
-          uri: http://localhost:8081
+            - name: StripPrefix
+              args:
+                parts: 0
+
+        # Voting Service Routes
+        - id: voting-service
+          uri: http://voting-service:8083
           predicates:
-            - Path=/auth/**
-      default-filters:
-        - JwtRelayFilter
+            - Path=/api/voting/**
+          filters:
+            - name: StripPrefix
+              args:
+                parts: 0
+
+        # Results Service Routes
+        - id: results-service
+          uri: http://results-service:8084
+          predicates:
+            - Path=/api/results/**
+          filters:
+            - name: StripPrefix
+              args:
+                parts: 0
+
+      # Global CORS Configuration
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - HEAD
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
   tracing:
     sampling:
       probability: 1.0
@@ -33,7 +71,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,metrics,prometheus,gateway
   zipkin:
     tracing:
       endpoint: ${SPRING_ZIPKIN_ENDPOINT:http://localhost:6334/api/v2/spans}

@@ -15,17 +15,19 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/polls")
+@RequestMapping("/api/polls")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PollController {
 
     private final PollRepository repository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CreatePollRequest req) {
+    public ResponseEntity<?> create(@RequestBody CreatePollRequest req, @RequestHeader(value = "X-User-Id", required = false) String userId) {
         Poll poll = new Poll();
         poll.setTitle(req.getTitle());
+        poll.setCreatedBy(userId != null ? userId : "anonymous");
         List<PollOption> options = req.getOptions().stream().map(text -> {
             PollOption opt = new PollOption();
             opt.setText(text);

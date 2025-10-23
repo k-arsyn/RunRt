@@ -22,6 +22,9 @@ public class Poll {
     @Column(nullable = false)
     private String title;
 
+    @Column
+    private String createdBy;
+
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PollOption> options = new ArrayList<>();
 }

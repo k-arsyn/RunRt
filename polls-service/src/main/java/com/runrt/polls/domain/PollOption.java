@@ -1,5 +1,6 @@
 package com.runrt.polls.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class PollOption {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poll_id")
+    @JsonBackReference
     private Poll poll;
 
     @Column(nullable = false)

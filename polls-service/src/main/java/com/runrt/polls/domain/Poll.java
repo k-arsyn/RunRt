@@ -1,5 +1,6 @@
 package com.runrt.polls.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,5 +27,6 @@ public class Poll {
     private String createdBy;
 
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<PollOption> options = new ArrayList<>();
 }

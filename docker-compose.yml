@@ -116,9 +116,9 @@ services:
       context: .
       dockerfile: api-gateway/Dockerfile
     environment:
-      # Removed redundant/conflicting TZ and JAVA_TOOL_OPTIONS
-      GATEWAY_JWT_BASE64_SECRET: dGVzdC1nYXRld2F5LXNlY3JldA==
-      GATEWAY_JWT_EXPIRATION_MS: 86400000
+      # Fixed: Use underscores which Spring converts to dots (gateway.jwt.base64-secret)
+      GATEWAY_JWT_BASE64SECRET: dGVzdC1nYXRld2F5LXNlY3JldA==
+      GATEWAY_JWT_EXPIRATIONMS: 86400000
       SPRING_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
       - auth-service

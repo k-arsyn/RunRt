@@ -39,5 +39,6 @@ management:
       endpoint: ${SPRING_ZIPKIN_ENDPOINT:http://localhost:6334/api/v2/spans}
 
 gateway:
-  jwt-base64-secret: dGVzdC1nYXRld2F5LXNlY3JldA==
-  jwt-expiration-ms: 86400000
+  jwt:
+    base64secret: ${GATEWAY_JWT_BASE64SECRET:dGVzdC1nYXRld2F5LXNlY3JldA==}
+    expirationms: ${GATEWAY_JWT_EXPIRATIONMS:86400000}

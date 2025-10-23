@@ -48,8 +48,19 @@ public class PollController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable UUID id) {
-        return repository.findById(id)
+        return repository.findByIdWithOptions(id)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody UpdatePollRequest req) {
+        return repository.findByIdWithOptions(id)
+                .map(poll -> {
+                    poll.setTitle(req.getTitle());
+                    Poll updated = repository.save(poll);
+                    return ResponseEntity.ok(updated);
+                })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -62,5 +73,10 @@ public class PollController {
     public static class CreatePollRequest {
         private String title;
         private List<String> options;
+    }
+
+    @Data
+    public static class UpdatePollRequest {
+        private String title;
     }
 }

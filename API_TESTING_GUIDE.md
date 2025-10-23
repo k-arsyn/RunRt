@@ -545,4 +545,3 @@ curl -X POST http://localhost:8080/votes \
 
 **Last Updated**: October 23, 2025
 **API Version**: 0.1.0-SNAPSHOT
-
